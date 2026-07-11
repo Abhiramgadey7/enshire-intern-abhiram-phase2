@@ -1,13 +1,133 @@
-Student Management API Day 2 Evidence
+Student Management API - Day 3 Evidence
 
-Server Status:
-FastAPI running successfully
+1. Server Startup
+Command:
+python -m uvicorn app.main:app --reload --log-level debug
 
-Endpoints Tested:
-✓ POST /students
-✓ GET /students
-✓ GET /students/{id}
-✓ PUT /students/{id}
-✓ DELETE /students/{id}
+Result:
+Application startup complete.
+Server running on http://127.0.0.1:8000
 
-All CRUD operations working successfully.
+
+2. API Health Check
+
+GET /
+
+Response:
+{
+    "message": "Student Management API Running"
+}
+
+Status:
+200 OK
+
+
+3. User Registration API
+
+POST /register
+
+Test:
+Created new user successfully.
+
+Response:
+{
+    "id": 1,
+    "email": "admin@example.com",
+    "role": "admin"
+}
+
+Status:
+201 Created
+
+
+4. Duplicate Registration Handling
+
+POST /register with existing email
+
+Response:
+{
+    "detail": "Email already registered"
+}
+
+Status:
+409 Conflict
+
+
+5. Login API
+
+POST /login
+
+Result:
+JWT access token generated successfully.
+
+Response:
+{
+    "access_token": "<JWT_TOKEN>",
+    "token_type": "bearer"
+}
+
+Status:
+200 OK
+
+
+6. Protected Route
+
+GET /me
+
+Authorization:
+Bearer JWT Token
+
+Response:
+{
+    "id": 1,
+    "email": "admin@example.com",
+    "role": "admin"
+}
+
+Status:
+200 OK
+
+
+7. Admin Role Authorization
+
+POST /admin-only-route
+
+Admin user access:
+
+Response:
+{
+    "status": "success",
+    "message": "Welcome Admin admin@example.com. System control authorized."
+}
+
+Status:
+200 OK
+
+
+8. Unauthorized Access Handling
+
+Without token:
+
+Response:
+{
+    "detail": "Not authenticated"
+}
+
+Status:
+401 Unauthorized
+
+
+9. Role Permission Handling
+
+Normal user accessing admin route:
+
+Response:
+{
+    "detail": "Permission denied"
+}
+
+Status:
+403 Forbidden
+
+
+Day 3 Task Completed Successfully.
