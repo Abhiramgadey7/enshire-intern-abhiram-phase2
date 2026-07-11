@@ -1,0 +1,13 @@
+Student Management API Day 2 Evidence
+
+Server Status:
+FastAPI running successfully
+
+Endpoints Tested:
+✓ POST /students
+✓ GET /students
+✓ GET /students/{id}
+✓ PUT /students/{id}
+✓ DELETE /students/{id}
+
+All CRUD operations working successfully.
