@@ -5,7 +5,9 @@ import logging
 import uuid
 from datetime import datetime
 import traceback
-
+from app.rag import generate_answer
+import app.auth as auth
+from app.rag import generate_answer
 
 from app.database import Base, engine, get_db
 from app import users
@@ -334,4 +336,13 @@ def delete_student(
 
     return {
         "message":"Student deleted successfully"
+    }
+@app.post("/ai/query")
+def ai_query(question: str):
+
+    answer = generate_answer(question)
+
+    return {
+        "question": question,
+        "answer": answer
     }
