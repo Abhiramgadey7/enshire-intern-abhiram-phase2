@@ -16,7 +16,9 @@ from app.schemas import (
     StudentResponse,
     StudentListResponse,
 )
+
 import app.auth as auth
+from app.rag import generate_answer
 
 
 # Create tables
@@ -334,4 +336,13 @@ def delete_student(
 
     return {
         "message":"Student deleted successfully"
+    }
+@app.post("/ai/query")
+def ai_query(question: str):
+
+    answer = generate_answer(question)
+
+    return {
+        "question": question,
+        "answer": answer
     }
