@@ -30,71 +30,49 @@ app = FastAPI(
 app.include_router(users.router)
 
 
-# -----------------------------
 # Logging Setup
-# -----------------------------
-
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
 
-# -----------------------------
 # Request Logging Middleware
-# -----------------------------
-
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
 
     request_id = str(uuid.uuid4())
 
-    logger.info(
-        {
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "level": "INFO",
-            "message": f"{request.method} {request.url.path}",
-            "request_id": request_id
-        }
-    )
-
+    logger.info({
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "level": "INFO",
+        "message": f"{request.method} {request.url.path}",
+        "request_id": request_id
+    })
 
     response = await call_next(request)
 
-
-    logger.info(
-        {
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "level": "INFO",
-            "message": f"Status {response.status_code}",
-            "request_id": request_id
-        }
-    )
-
+    logger.info({
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "level": "INFO",
+        "message": f"Status {response.status_code}",
+        "request_id": request_id
+    })
 
     response.headers["X-Request-ID"] = request_id
 
     return response
 
 
-
-# -----------------------------
 # Home Route
-# -----------------------------
-
 @app.get("/")
 def home():
-
     return {
         "message": "Student Management API Running",
         "version": "3.0.0"
     }
 
 
-
-# -----------------------------
 # Create Student
-# -----------------------------
-
 @app.post("/students", response_model=StudentResponse)
 def create_student(
     student: StudentCreate,
@@ -108,21 +86,14 @@ def create_student(
         course=student.course
     )
 
-
     db.add(new_student)
     db.commit()
     db.refresh(new_student)
 
-
     return new_student
 
 
-
-# -----------------------------
 # Get Students
-# Pagination + Filtering + Sorting
-# -----------------------------
-
 @app.get("/students", response_model=StudentListResponse)
 def get_students(
     limit: int = Query(10, ge=1, le=100),
@@ -136,18 +107,11 @@ def get_students(
 
     query = db.query(Student)
 
-
     if name:
-        query = query.filter(
-            Student.name.ilike(f"%{name}%")
-        )
-
+        query = query.filter(Student.name.ilike(f"%{name}%"))
 
     if course:
-        query = query.filter(
-            Student.course.ilike(f"%{course}%")
-        )
-
+        query = query.filter(Student.course.ilike(f"%{course}%"))
 
     allowed_fields = {
         "id": Student.id,
@@ -156,14 +120,11 @@ def get_students(
         "course": Student.course
     }
 
-
     reverse = False
-
 
     if sort.startswith("-"):
         reverse = True
         sort = sort[1:]
-
 
     if sort not in allowed_fields:
         raise HTTPException(
@@ -171,23 +132,17 @@ def get_students(
             detail="Invalid sort field"
         )
 
-
     column = allowed_fields[sort]
 
-
-    if reverse:
-        query = query.order_by(column.desc())
-    else:
-        query = query.order_by(column.asc())
-
+    query = query.order_by(
+        column.desc() if reverse else column.asc()
+    )
 
     total = query.count()
 
     students = query.offset(offset).limit(limit).all()
 
-
     page = (offset // limit) + 1
-
 
     return {
         "total": total,
@@ -197,11 +152,7 @@ def get_students(
     }
 
 
-
-# -----------------------------
 # Get Student By ID
-# -----------------------------
-
 @app.get("/students/{student_id}", response_model=StudentResponse)
 def get_student(
     student_id: int,
@@ -213,21 +164,16 @@ def get_student(
         Student.id == student_id
     ).first()
 
-
     if not student:
         raise HTTPException(
             status_code=404,
             detail="Student not found"
         )
 
-
     return student
 
 
-# -----------------------------
 # Update Student
-# -----------------------------
-
 @app.put("/students/{student_id}", response_model=StudentResponse)
 def update_student(
     student_id: int,
@@ -235,10 +181,16 @@ def update_student(
     db: Session = Depends(get_db),
     current_user=Depends(auth.get_current_user)
 ):
-    student = db.query(Student).filter(Student.id == student_id).first()
+
+    student = db.query(Student).filter(
+        Student.id == student_id
+    ).first()
 
     if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Student not found"
+        )
 
     student.name = student_data.name
     student.age = student_data.age
@@ -248,17 +200,19 @@ def update_student(
     db.refresh(student)
 
     return student
-# -----------------------------
-# Delete Student
-# -----------------------------
 
+
+# Delete Student
 @app.delete("/students/{student_id}")
 def delete_student(
     student_id: int,
     db: Session = Depends(get_db),
     current_user=Depends(auth.get_current_user)
 ):
-    student = db.query(Student).filter(Student.id == student_id).first()
+
+    student = db.query(Student).filter(
+        Student.id == student_id
+    ).first()
 
     if not student:
         raise HTTPException(
