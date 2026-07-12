@@ -131,3 +131,10 @@ Status:
 
 
 Day 3 Task Completed Successfully.
+Day 7 Testing Improvements
+
+Command:
+pytest
+
+Result:
+11 passed   
