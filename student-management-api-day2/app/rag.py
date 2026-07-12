@@ -1,15 +1,22 @@
+documents = [
+    "Students can create, update, view and delete their records.",
+    "Authentication uses JWT tokens for secure access.",
+    "Admins have permission to access admin routes.",
+    "The API supports student management operations."
+]
+
+
 def generate_answer(question: str):
-
-    knowledge = {
-        "student": "Students can be created, updated, deleted and searched using the Student Management API.",
-        "api": "This project uses FastAPI to build REST APIs.",
-        "authentication": "The API uses JWT authentication for user security."
-    }
-
     question = question.lower()
 
-    for key, value in knowledge.items():
-        if key in question:
-            return value
+    for document in documents:
+        if any(word in document.lower() for word in question.split()):
+            return {
+                "question": question,
+                "answer": document
+            }
 
-    return "No relevant information found."
+    return {
+        "question": question,
+        "answer": "No relevant information found."
+    }

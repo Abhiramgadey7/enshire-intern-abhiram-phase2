@@ -18,7 +18,9 @@ from app.schemas import (
     StudentResponse,
     StudentListResponse,
 )
+
 import app.auth as auth
+from app.rag import generate_answer
 
 
 # Create tables
